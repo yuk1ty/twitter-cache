@@ -25,32 +25,32 @@ import org.scalatest.concurrent.ScalaFutures
 
 class TwitterCacheSpec extends WordSpec {
 
-  "TwitterCache" should {
-    "cache future value" in {
-      val caffeine = Caffeine
-        .newBuilder()
-        .maximumSize(1)
-        .expireAfterWrite(10, TimeUnit.SECONDS)
-        .build[TwitterCacheKey[Long], Future[String]]
-      val twitterCache = TwitterCache(caffeine)
-      twitterCache.execIfNeeded(_ => Future.value("AAA"))
-    }
-
-    "with companion objects" in {
-      object Cache {
-        def create[K, V](maximumSize: Long,
-                         expireAfterAccessSeconds: Long): TwitterCache[K, V] = {
-          lazy val caffeine = Caffeine
-            .newBuilder()
-            .maximumSize(maximumSize)
-            .expireAfterAccess(expireAfterAccessSeconds, TimeUnit.SECONDS)
-            .build[K, Future[V]]()
-          TwitterCache(caffeine)
-        }
-      }
-
-      val twitterCache = Cache.create[TwitterCacheKey[Long], String](10000, 10)
-      twitterCache.execIfNeeded(_ => Future.value(""))
-    }
-  }
+//  "TwitterCache" should {
+//    "cache future value" in {
+//      val caffeine = Caffeine
+//        .newBuilder()
+//        .maximumSize(1)
+//        .expireAfterWrite(10, TimeUnit.SECONDS)
+//        .build[TwitterCacheKey[Long], Future[String]]
+//      val twitterCache = TwitterCache(caffeine)
+//      twitterCache.execIfNeeded(_ => Future.value("AAA"))
+//    }
+//
+//    "with companion objects" in {
+//      object Cache {
+//        def create[K, V](maximumSize: Long,
+//                         expireAfterAccessSeconds: Long): TwitterCache[K, V] = {
+//          lazy val caffeine = Caffeine
+//            .newBuilder()
+//            .maximumSize(maximumSize)
+//            .expireAfterAccess(expireAfterAccessSeconds, TimeUnit.SECONDS)
+//            .build[K, Future[V]]()
+//          TwitterCache(caffeine)
+//        }
+//      }
+//
+//      val twitterCache = Cache.create[TwitterCacheKey[Long], String](10000, 10)
+//      twitterCache.execIfNeeded(_ => Future.value(""))
+//    }
+//  }
 }

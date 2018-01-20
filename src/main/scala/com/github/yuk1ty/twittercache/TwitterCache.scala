@@ -39,7 +39,7 @@ case class GuavaTwitterCache[K <: AnyRef, V]() extends GenericCache[K, V] {
   override def execIfNeeded(f: K => Future[V]): K => Future[V] = ???
 }
 
-case class TwitterCache[K <: AnyRef, V](private[this] val _underlying: Cache[K, Future[V]])
+case class TwitterCache[K <: AnyRef, V](private val _underlying: Cache[K, Future[V]])
     extends GenericCache[K, V] {
 
   override protected def underlying: Cache[K, Future[V]] = _underlying
@@ -54,6 +54,6 @@ case class TwitterCache[K <: AnyRef, V](private[this] val _underlying: Cache[K, 
   * @param key key value (like deriving [[AnyVal]])
   * @tparam K type of key
   */
-case class TwitterCacheKey[K](private[this] val key: K) {
+case class TwitterCacheKey[K](private val key: K) {
   def unwrap: K = key
 }
