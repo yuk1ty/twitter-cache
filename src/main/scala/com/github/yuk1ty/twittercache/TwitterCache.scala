@@ -1,6 +1,7 @@
 package com.github.yuk1ty.twittercache
 
-import com.github.benmanes.caffeine.cache.{Cache, Caffeine}
+import com.github.benmanes.caffeine.cache.Cache
+import com.twitter.cache.caffeine.CaffeineCache
 import com.twitter.util.Future
 
 /*
@@ -23,17 +24,28 @@ private[twittercache] trait GenericCache[K <: AnyRef, V] {
 
   /** define underlying cache */
   protected def underlying: Cache[K, Future[V]]
+
+  /**
+    * Execute function `f` if there is no cache in it.
+    * If there are some cache, returns their values.
+    */
+  def execIfNeeded(f: K => Future[V]): K => Future[V]
 }
 
 case class GuavaTwitterCache[K <: AnyRef, V]() extends GenericCache[K, V] {
 
   override protected def underlying: Cache[K, Future[V]] = ???
+
+  override def execIfNeeded(f: K => Future[V]): K => Future[V] = ???
 }
 
-case class TwitterCache[K <: AnyRef, V]() extends GenericCache[K, V] {
+case class TwitterCache[K <: AnyRef, V](private[this] val _underlying: Cache[K, Future[V]])
+    extends GenericCache[K, V] {
 
-  override protected def underlying: Cache[K, Future[V]] =
-    Caffeine.newBuilder().build[K, Future[V]]
+  override protected def underlying: Cache[K, Future[V]] = _underlying
+
+  override def execIfNeeded(f: K => Future[V]): K => Future[V] =
+    CaffeineCache.fromCache(f, underlying)
 }
 
 /**
@@ -42,6 +54,6 @@ case class TwitterCache[K <: AnyRef, V]() extends GenericCache[K, V] {
   * @param key key value (like deriving [[AnyVal]])
   * @tparam K type of key
   */
-case class TwitterCacheKey[K](private val key: K) {
+case class TwitterCacheKey[K](private[this] val key: K) {
   def unwrap: K = key
 }
