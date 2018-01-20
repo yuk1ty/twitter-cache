@@ -3,6 +3,7 @@ package com.github.yuk1ty.twittercache
 import java.util.concurrent.TimeUnit
 
 import com.github.benmanes.caffeine.cache.Caffeine
+import com.google.common.cache.CacheBuilder
 import com.twitter.util.{Await, Future}
 import org.scalatest.{AsyncWordSpec, WordSpec}
 
@@ -56,6 +57,45 @@ class TwitterCacheSpec extends WordSpec {
         val twitterCache =
           Cache.create[TwitterCacheKey[Long], String](10000,
                                                       10.seconds.inSeconds)
+        Await.result(
+          twitterCache.execIfNeeded(_ => Future.value("AAA"))(
+            TwitterCacheKey(1))) == "AAA"
+      }
+    }
+  }
+
+  "GuavaCache" should {
+    "cache future value" in {
+      val guava = CacheBuilder
+        .newBuilder()
+        .maximumSize(1)
+        .expireAfterAccess(10, TimeUnit.SECONDS)
+        .build[TwitterCacheKey[Long], Future[String]]
+      val twitterCache = GuavaTwitterCache(guava)
+      Await.result(
+        twitterCache
+          .execIfNeeded(_ => Future.value("AAA"))(TwitterCacheKey(1))) == "AAA"
+    }
+
+    "with companion object" in {
+      object Cache {
+        object Cache {
+          def create[K <: AnyRef, V](
+                                      maximumSize: Long,
+                                      expireAfterAccessSeconds: Long): GuavaTwitterCache[K, V] = {
+            lazy val guava = CacheBuilder
+              .newBuilder()
+              .maximumSize(maximumSize)
+              .expireAfterAccess(expireAfterAccessSeconds, TimeUnit.SECONDS)
+              .build[K, Future[V]]()
+            GuavaTwitterCache(guava)
+          }
+        }
+
+        import com.twitter.conversions.time._
+        val twitterCache =
+          Cache.create[TwitterCacheKey[Long], String](10000,
+            10.seconds.inSeconds)
         Await.result(
           twitterCache.execIfNeeded(_ => Future.value("AAA"))(
             TwitterCacheKey(1))) == "AAA"

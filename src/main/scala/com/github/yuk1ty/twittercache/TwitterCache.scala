@@ -2,6 +2,7 @@ package com.github.yuk1ty.twittercache
 
 import com.github.benmanes.caffeine.cache.Cache
 import com.twitter.cache.caffeine.CaffeineCache
+import com.twitter.cache.guava.GuavaCache
 import com.twitter.util.Future
 
 /*
@@ -22,9 +23,6 @@ import com.twitter.util.Future
 
 private[twittercache] trait GenericCache[K <: AnyRef, V] {
 
-  /** define underlying cache */
-  protected def underlying: Cache[K, Future[V]]
-
   /**
     * Execute function `f` if there is no cache in it.
     * If there are some cache, returns their values.
@@ -32,18 +30,16 @@ private[twittercache] trait GenericCache[K <: AnyRef, V] {
   def execIfNeeded(f: K => Future[V]): K => Future[V]
 }
 
-case class GuavaTwitterCache[K <: AnyRef, V]() extends GenericCache[K, V] {
-
-  override protected def underlying: Cache[K, Future[V]] = ???
-
-  override def execIfNeeded(f: K => Future[V]): K => Future[V] = ???
+case class GuavaTwitterCache[K <: AnyRef, V](
+    private val underlying: com.google.common.cache.Cache[K, Future[V]])
+    extends GenericCache[K, V] {
+  override def execIfNeeded(f: K => Future[V]): K => Future[V] =
+    GuavaCache.fromCache(f, underlying)
 }
 
-case class TwitterCache[K <: AnyRef, V](private val _underlying: Cache[K, Future[V]])
+case class TwitterCache[K <: AnyRef, V](
+    private val underlying: Cache[K, Future[V]])
     extends GenericCache[K, V] {
-
-  override protected def underlying: Cache[K, Future[V]] = _underlying
-
   override def execIfNeeded(f: K => Future[V]): K => Future[V] =
     CaffeineCache.fromCache(f, underlying)
 }

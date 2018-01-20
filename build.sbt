@@ -1,6 +1,7 @@
 // Dependencies
 lazy val twitterUtilCore = "com.twitter" %% "util-core"
 lazy val twitterUtilCache = "com.twitter" %% "util-cache"
+lazy val twitterUtilCacheGuava = "com.twitter" %% "util-cache-guava"
 lazy val scalactic = "org.scalactic" %% "scalactic"
 lazy val scalatest = "org.scalatest" %% "scalatest"
 
@@ -17,6 +18,7 @@ scalaVersion := "2.12.4"
 
 libraryDependencies += twitterUtilCore % twitterUtilVersion
 libraryDependencies += twitterUtilCache % twitterUtilVersion
+libraryDependencies += twitterUtilCacheGuava % twitterUtilVersion
 
 libraryDependencies += scalactic % scalacticVersion % "test"
 libraryDependencies += scalatest % scalaTestVersion % "test"
