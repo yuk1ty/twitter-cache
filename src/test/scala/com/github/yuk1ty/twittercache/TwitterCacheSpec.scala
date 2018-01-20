@@ -3,9 +3,8 @@ package com.github.yuk1ty.twittercache
 import java.util.concurrent.TimeUnit
 
 import com.github.benmanes.caffeine.cache.Caffeine
-import com.twitter.util.Future
-import org.scalatest.WordSpec
-import org.scalatest.concurrent.ScalaFutures
+import com.twitter.util.{Await, Future}
+import org.scalatest.{AsyncWordSpec, WordSpec}
 
 /*
  * Copyright 2017 Yuki Toyoda
@@ -25,32 +24,42 @@ import org.scalatest.concurrent.ScalaFutures
 
 class TwitterCacheSpec extends WordSpec {
 
-//  "TwitterCache" should {
-//    "cache future value" in {
-//      val caffeine = Caffeine
-//        .newBuilder()
-//        .maximumSize(1)
-//        .expireAfterWrite(10, TimeUnit.SECONDS)
-//        .build[TwitterCacheKey[Long], Future[String]]
-//      val twitterCache = TwitterCache(caffeine)
-//      twitterCache.execIfNeeded(_ => Future.value("AAA"))
-//    }
-//
-//    "with companion objects" in {
-//      object Cache {
-//        def create[K, V](maximumSize: Long,
-//                         expireAfterAccessSeconds: Long): TwitterCache[K, V] = {
-//          lazy val caffeine = Caffeine
-//            .newBuilder()
-//            .maximumSize(maximumSize)
-//            .expireAfterAccess(expireAfterAccessSeconds, TimeUnit.SECONDS)
-//            .build[K, Future[V]]()
-//          TwitterCache(caffeine)
-//        }
-//      }
-//
-//      val twitterCache = Cache.create[TwitterCacheKey[Long], String](10000, 10)
-//      twitterCache.execIfNeeded(_ => Future.value(""))
-//    }
-//  }
+  "TwitterCache" should {
+    "cache future value" in {
+      val caffeine = Caffeine
+        .newBuilder()
+        .maximumSize(1)
+        .expireAfterWrite(10, TimeUnit.SECONDS)
+        .build[TwitterCacheKey[Long], Future[String]]
+      val twitterCache = TwitterCache(caffeine)
+      Await.result(
+        twitterCache
+          .execIfNeeded(_ => Future.value("AAA"))(TwitterCacheKey(1))) == "AAA"
+    }
+
+    "with companion object" in {
+      object Cache {
+        object Cache {
+          def create[K <: AnyRef, V](
+              maximumSize: Long,
+              expireAfterAccessSeconds: Long): TwitterCache[K, V] = {
+            lazy val caffeine = Caffeine
+              .newBuilder()
+              .maximumSize(maximumSize)
+              .expireAfterAccess(expireAfterAccessSeconds, TimeUnit.SECONDS)
+              .build[K, Future[V]]()
+            TwitterCache(caffeine)
+          }
+        }
+
+        import com.twitter.conversions.time._
+        val twitterCache =
+          Cache.create[TwitterCacheKey[Long], String](10000,
+                                                      10.seconds.inSeconds)
+        Await.result(
+          twitterCache.execIfNeeded(_ => Future.value("AAA"))(
+            TwitterCacheKey(1))) == "AAA"
+      }
+    }
+  }
 }
