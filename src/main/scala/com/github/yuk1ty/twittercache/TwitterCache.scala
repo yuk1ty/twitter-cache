@@ -1,4 +1,4 @@
-package twittercache
+package com.github.yuk1ty.twittercache
 
 import com.github.benmanes.caffeine.cache.{Cache, Caffeine}
 import com.twitter.util.Future
