@@ -11,9 +11,7 @@ lazy val scalaTestVersion = "3.0.4"
 lazy val scalacticVersion = "3.0.4"
 
 name := "twitter-cache"
-
 version := "0.1"
-
 scalaVersion := "2.12.4"
 
 libraryDependencies += twitterUtilCore % twitterUtilVersion
@@ -22,3 +20,22 @@ libraryDependencies += twitterUtilCacheGuava % twitterUtilVersion
 
 libraryDependencies += scalactic % scalacticVersion % "test"
 libraryDependencies += scalatest % scalaTestVersion % "test"
+
+homepage := Some(url("https://github.com/yuk1ty/twitter-cache"))
+scmInfo := Some(
+  ScmInfo(url("https://github.com/yuk1ty/twitter-cache"),
+          "git@github.com:yuk1ty/twitter-cache.git"))
+developers := List(
+  Developer("yuk1ty",
+            "Yuki Toyoda",
+            "yuki.multiplus@gmail.com",
+            url("https://github.com/yuk1ty")))
+licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0"))
+publishMavenStyle := true
+
+publishTo := Some(
+  if (isSnapshot.value)
+    Opts.resolver.sonatypeSnapshots
+  else
+    Opts.resolver.sonatypeStaging
+)
