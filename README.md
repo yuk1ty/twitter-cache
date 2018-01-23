@@ -3,7 +3,7 @@
 
 This is a WIP project.
 
-A utility library for `twitter/util/util-cache`.
+An utility library for `twitter/util/util-cache`.
 
 ## Examples
 
@@ -21,7 +21,7 @@ To get start, all we need is create `TwitterCache` and inject `Caffeine` into it
 ```scala
 val caffeine = Caffeine
     .newBuilder()
-    .maximumSize(1)
+    .maximumSize(10000)
     .expireAfterWrite(10, TimeUnit.SECONDS)
     .build[TwitterCacheKey[Long], Future[String]]
 val twitterCache = TwitterCache(caffeine)
@@ -31,7 +31,7 @@ twitterCache
 
 ### Generate `TwitterCache` with companion object
 
-Or we can create some companion object to create `Caffeine` with some properties, and inject this companion object into `TwitterCache`. It works equally well.
+Or we can create some companion objects to create `Caffeine` with some properties, and inject this companion object into `TwitterCache`. It works equally well.
 
 ```scala
 object Cache {
