@@ -27,20 +27,20 @@ private[twittercache] trait GenericCache[K <: AnyRef, V] {
     * Execute function `f` if there is no cache in it.
     * If there are some cache, returns their values.
     */
-  def execIfNeeded(f: K => Future[V]): K => Future[V]
+  def applyIfNeeded(f: K => Future[V]): K => Future[V]
 }
 
 case class GuavaTwitterCache[K <: AnyRef, V](
     private val underlying: com.google.common.cache.Cache[K, Future[V]])
     extends GenericCache[K, V] {
-  override def execIfNeeded(f: K => Future[V]): K => Future[V] =
+  override def applyIfNeeded(f: K => Future[V]): K => Future[V] =
     GuavaCache.fromCache(f, underlying)
 }
 
 case class TwitterCache[K <: AnyRef, V](
     private val underlying: Cache[K, Future[V]])
     extends GenericCache[K, V] {
-  override def execIfNeeded(f: K => Future[V]): K => Future[V] =
+  override def applyIfNeeded(f: K => Future[V]): K => Future[V] =
     CaffeineCache.fromCache(f, underlying)
 }
 

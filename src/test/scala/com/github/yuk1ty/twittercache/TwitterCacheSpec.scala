@@ -35,32 +35,29 @@ class TwitterCacheSpec extends WordSpec {
       val twitterCache = TwitterCache(caffeine)
       Await.result(
         twitterCache
-          .execIfNeeded(_ => Future.value("AAA"))(TwitterCacheKey(1))) == "AAA"
+          .applyIfNeeded(_ => Future.value("AAA"))(TwitterCacheKey(1))) == "AAA"
     }
 
     "with companion object" in {
       object Cache {
-        object Cache {
-          def create[K <: AnyRef, V](
-              maximumSize: Long,
-              expireAfterAccessSeconds: Long): TwitterCache[K, V] = {
-            lazy val caffeine = Caffeine
-              .newBuilder()
-              .maximumSize(maximumSize)
-              .expireAfterAccess(expireAfterAccessSeconds, TimeUnit.SECONDS)
-              .build[K, Future[V]]()
-            TwitterCache(caffeine)
-          }
+        def create[K <: AnyRef, V](
+            maximumSize: Long,
+            expireAfterAccessSeconds: Long): TwitterCache[K, V] = {
+          lazy val caffeine = Caffeine
+            .newBuilder()
+            .maximumSize(maximumSize)
+            .expireAfterAccess(expireAfterAccessSeconds, TimeUnit.SECONDS)
+            .build[K, Future[V]]()
+          TwitterCache(caffeine)
         }
-
-        import com.twitter.conversions.time._
-        val twitterCache =
-          Cache.create[TwitterCacheKey[Long], String](10000,
-                                                      10.seconds.inSeconds)
-        Await.result(
-          twitterCache.execIfNeeded(_ => Future.value("AAA"))(
-            TwitterCacheKey(1))) == "AAA"
       }
+
+      import com.twitter.conversions.time._
+      val twitterCache =
+        Cache.create[TwitterCacheKey[Long], String](10000, 10.seconds.inSeconds)
+      Await.result(
+        twitterCache
+          .applyIfNeeded(_ => Future.value("AAA"))(TwitterCacheKey(1))) == "AAA"
     }
   }
 
@@ -74,32 +71,29 @@ class TwitterCacheSpec extends WordSpec {
       val twitterCache = GuavaTwitterCache(guava)
       Await.result(
         twitterCache
-          .execIfNeeded(_ => Future.value("AAA"))(TwitterCacheKey(1))) == "AAA"
+          .applyIfNeeded(_ => Future.value("AAA"))(TwitterCacheKey(1))) == "AAA"
     }
 
     "with companion object" in {
       object Cache {
-        object Cache {
-          def create[K <: AnyRef, V](
-                                      maximumSize: Long,
-                                      expireAfterAccessSeconds: Long): GuavaTwitterCache[K, V] = {
-            lazy val guava = CacheBuilder
-              .newBuilder()
-              .maximumSize(maximumSize)
-              .expireAfterAccess(expireAfterAccessSeconds, TimeUnit.SECONDS)
-              .build[K, Future[V]]()
-            GuavaTwitterCache(guava)
-          }
+        def create[K <: AnyRef, V](
+            maximumSize: Long,
+            expireAfterAccessSeconds: Long): GuavaTwitterCache[K, V] = {
+          lazy val guava = CacheBuilder
+            .newBuilder()
+            .maximumSize(maximumSize)
+            .expireAfterAccess(expireAfterAccessSeconds, TimeUnit.SECONDS)
+            .build[K, Future[V]]()
+          GuavaTwitterCache(guava)
         }
-
-        import com.twitter.conversions.time._
-        val twitterCache =
-          Cache.create[TwitterCacheKey[Long], String](10000,
-            10.seconds.inSeconds)
-        Await.result(
-          twitterCache.execIfNeeded(_ => Future.value("AAA"))(
-            TwitterCacheKey(1))) == "AAA"
       }
+
+      import com.twitter.conversions.time._
+      val twitterCache =
+        Cache.create[TwitterCacheKey[Long], String](10000, 10.seconds.inSeconds)
+      Await.result(
+        twitterCache
+          .applyIfNeeded(_ => Future.value("AAA"))(TwitterCacheKey(1))) == "AAA"
     }
   }
 }

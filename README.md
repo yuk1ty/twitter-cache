@@ -26,7 +26,7 @@ val caffeine = Caffeine
     .build[TwitterCacheKey[Long], Future[String]]
 val twitterCache = TwitterCache(caffeine)
 twitterCache
-    .execIfNeeded(_ => Future.value("AAA"))(TwitterCacheKey(1))
+    .applyIfNeeded(_ => Future.value("AAA"))(TwitterCacheKey(1))
 ```
 
 ### Generate `TwitterCache` with companion object
@@ -52,7 +52,7 @@ val twitterCache =
   Cache.create[TwitterCacheKey[Long], String](10000,
                                               10.seconds.inSeconds)
 
-twitterCache.execIfNeeded(_ => Future.value("AAA"))(TwitterCacheKey(1)))
+twitterCache.applyIfNeeded(_ => Future.value("AAA"))(TwitterCacheKey(1)))
 ```
 
 ## Future Plan
