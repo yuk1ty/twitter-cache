@@ -1,8 +1,6 @@
 # twitter-cache
 [![Build Status](https://travis-ci.org/yuk1ty/twitter-cache.svg?branch=master)](https://travis-ci.org/yuk1ty/twitter-cache)
 
-This is a WIP project.
-
 An utility library for `twitter/util/util-cache`.
 
 ## Examples
@@ -56,4 +54,4 @@ twitterCache.applyIfNeeded(_ => Future.value("AAA"))(TwitterCacheKey(1)))
 ```
 
 ## Future Plan
-* CacheLoader
+* Register to sbt.
